@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using GeotabChallenge.Models;
 using GeotabChallenge.ExternalServices;
+using GeotabChallenge.Services;
 
 namespace GeotabChallenge
 {
@@ -12,16 +13,21 @@ namespace GeotabChallenge
         static void Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
+            var geotabService = host.Services.GetRequiredService<IGeotabService>();
+            geotabService.GetVehicles().Wait();
         }
 
-        static IHostBuilder CreateHostBuilder(string[] args) => Host.CreateDefaultBuilder(args).ConfigureAppConfiguration((context, config) =>
-        {
-            config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-        }).
-        ConfigureServices((context, services) =>
-        {
-            services.Configure<GeotabSettings>(context.Configuration.GetSection("ApiSettings"));
-            services.AddSingleton<IGeotabService, GeotabService>();            
-        });
+        static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.Configure<GeotabSettings>(context.Configuration.GetSection("GeotabSettings"));
+                services.AddTransient<IGeotabService, GeotabService>();
+                services.AddTransient<IVehiclesService, VehiclesService>();
+            });
     }
 }
