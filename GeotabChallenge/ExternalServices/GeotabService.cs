@@ -18,7 +18,7 @@ namespace GeotabChallenge.ExternalServices
         public GeotabService(IOptions<GeotabSettings> settings)
         {
             _settings = settings.Value;
-            _api = new API(_settings.User, _settings.Pass, null, _settings.Database);
+            _api = new API(_settings.User, _settings.Pass, null, _settings.Database, _settings.Server);
             InitializeAsync().Wait();
         }
 
@@ -37,6 +37,7 @@ namespace GeotabChallenge.ExternalServices
         public async Task<string> GetVehicles()
         {
             var vehicles = await _api.CallAsync<object>("Get", typeof(Device));
+            Console.WriteLine("vehicles: " + vehicles);
             return vehicles.ToString();
         }
     }
