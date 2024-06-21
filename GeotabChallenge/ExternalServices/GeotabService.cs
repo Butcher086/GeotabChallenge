@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Geotab.Checkmate;
 using Geotab.Checkmate.ObjectModel;
+using Newtonsoft.Json;
+using GeotabChallenge.Models.Device;
+using GeotabChallenge.Models.Vehicle;
 
 namespace GeotabChallenge.ExternalServices
 {
@@ -34,11 +37,32 @@ namespace GeotabChallenge.ExternalServices
             }            
         }
 
-        public async Task<string> GetVehicles()
+        public async Task<IEnumerable<DeviceData>> GetDevices()
         {
-            var vehicles = await _api.CallAsync<object>("Get", typeof(Device));
-            Console.WriteLine("vehicles: " + vehicles);
-            return vehicles.ToString();
+            var response = await _api.CallAsync<object>("Get", typeof(Device));  
+            var devices = JsonConvert.DeserializeObject<List<DeviceData>>(response.ToString());            
+
+            return devices;
+        }  
+        
+        public async Task<IEnumerable<VehicleData>> GetVehicles(IEnumerable<DeviceData> devices)
+        {
+            var vehicles = new List<VehicleData>();
+
+            foreach (var device in devices)
+            {
+                vehicles.Add(new VehicleData
+                {
+                    Id = device.vehicleIdentificationNumber,
+                    TimeStamp = device.workTime,
+                    VIN = device.vehicleIdentificationNumber,
+                    Coordinates = device.timeZoneId,
+                    Odometer = device.odometerFactor.ToString(),
+                    LicensePlate = device.licensePlate
+                });
+
+            }
+            return vehicles;
         }
     }
 }

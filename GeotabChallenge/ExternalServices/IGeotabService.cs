@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GeotabChallenge.Models.Device;
+using GeotabChallenge.Models.Vehicle;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,7 @@ namespace GeotabChallenge.ExternalServices
 {
     public interface IGeotabService
     {
-        Task<string> GetVehicles();
+        Task<IEnumerable<DeviceData>> GetDevices();        
+        Task<IEnumerable<VehicleData>> GetVehicles(IEnumerable<DeviceData> devices);
     }
 }

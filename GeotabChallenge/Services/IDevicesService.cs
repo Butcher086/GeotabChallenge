@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace GeotabChallenge.Services
 {
-    public interface IVehiclesService
+    public interface IDevicesService
     {
-        Task GetVehicles();
-        Task WriteVehiclesToCsv(IEnumerable<DeviceData> devices);
+        Task<IEnumerable<DeviceData>> GetDevices();
     }
 }

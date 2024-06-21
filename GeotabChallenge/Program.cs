@@ -14,7 +14,18 @@ namespace GeotabChallenge
         {
             var host = CreateHostBuilder(args).Build();
             var geotabService = host.Services.GetRequiredService<IGeotabService>();
-            geotabService.GetVehicles().Wait();
+            var devicesService = host.Services.GetRequiredService<IDevicesService>();
+            //var vehiclesService = host.Services.GetRequiredService<IVehiclesService>();
+            var csvWriterService = host.Services.GetRequiredService<ICsvWriterService>();
+
+            var devices = devicesService.GetDevices().Result;
+            var vehicles = geotabService.GetVehicles(devices).Result;
+            foreach (var vehicle in vehicles)
+            {
+                csvWriterService.WriteVehicleToCsvAsync(vehicle).Wait();
+            }            
+
+
         }
 
         static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -28,6 +39,8 @@ namespace GeotabChallenge
                 services.Configure<GeotabSettings>(context.Configuration.GetSection("GeotabSettings"));
                 services.AddTransient<IGeotabService, GeotabService>();
                 services.AddTransient<IVehiclesService, VehiclesService>();
+                services.AddTransient<IDevicesService, DevicesService>();
+                services.AddTransient<ICsvWriterService, CsvWriterService>();
             });
     }
 }
