@@ -14,12 +14,28 @@ namespace GeotabChallenge.ExternalServices
             var filepath = Path.Combine("Vehicles", $"{vehicleData.Id}.csv");
             Directory.CreateDirectory(Path.GetDirectoryName(filepath));
 
-            using (var writer = new StreamWriter(filepath))
+            var newEntry = $"{vehicleData.Id},{vehicleData.TimeStamp},{vehicleData.VIN},{vehicleData.Coordinates},{vehicleData.Odometer},{vehicleData.LicensePlate}";
+            if (File.Exists(filepath))
             {
-                await writer.WriteLineAsync("Id,TimeStamp,VIN,Coordinates,Odometer,LicensePlate");
-                await writer.WriteLineAsync($"{vehicleData.Id},{vehicleData.TimeStamp},{vehicleData.VIN},{vehicleData.Coordinates},{vehicleData.Odometer},{vehicleData.LicensePlate}");
+                var existingEntries = await File.ReadAllLinesAsync(filepath);
+                if (existingEntries.Contains(newEntry))
+                {
+                    using (var writer = new StreamWriter(filepath, append:true))
+                    {
+                        await writer.WriteLineAsync(newEntry);
+                    }
+                    Console.WriteLine($"Vehicle data for {vehicleData.Id} updated.");
+                }
             }
-            Console.WriteLine($"Vehicle data written to {filepath}");
+            else
+            {
+                using (var writer = new StreamWriter(filepath))
+                {
+                    await writer.WriteLineAsync("Id,TimeStamp,VIN,Coordinates,Odometer,LicensePlate");
+                    await writer.WriteLineAsync(newEntry);
+                }
+                Console.WriteLine($"Vehicle data file for {vehicleData.Id} created.");
+            }            
         }
     }
 }

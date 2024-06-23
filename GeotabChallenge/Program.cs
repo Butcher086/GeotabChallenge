@@ -16,15 +16,16 @@ namespace GeotabChallenge
             var geotabService = host.Services.GetRequiredService<IGeotabService>();
             var devicesService = host.Services.GetRequiredService<IDevicesService>();
             //var vehiclesService = host.Services.GetRequiredService<IVehiclesService>();
-            var csvWriterService = host.Services.GetRequiredService<ICsvWriterService>();
+            var csvWriterService = host.Services.GetRequiredService<ICsvWriterService>();            
 
-            var devices = devicesService.GetDevices().Result;
-            var vehicles = geotabService.GetVehicles(devices).Result;
-            foreach (var vehicle in vehicles)
-            {
-                csvWriterService.WriteVehicleToCsvAsync(vehicle).Wait();
-            }            
+            //var devices = devicesService.GetDevices().Result;            
 
+            //var vehicles = geotabService.GetVehicles(devices).Result;
+            //foreach (var vehicle in vehicles)
+            //{
+            //    csvWriterService.WriteVehicleToCsvAsync(vehicle).Wait();
+            //}
+            host.Run();
 
         }
 
@@ -41,6 +42,8 @@ namespace GeotabChallenge
                 services.AddTransient<IVehiclesService, VehiclesService>();
                 services.AddTransient<IDevicesService, DevicesService>();
                 services.AddTransient<ICsvWriterService, CsvWriterService>();
+
+                services.AddHostedService<VehicleMonitoringService>();
             });
     }
 }
